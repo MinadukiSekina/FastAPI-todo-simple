@@ -1,3 +1,9 @@
+from fastapi import Depends
+
+from app.models.todo import TodoCreate, TodoRead, TodoUpdate
+from app.repositories.todoRepository import TodoRepository, get_todo_repository
+
+
 class TodoUsecase:
     """Todo操作のためのユースケースクラス。
 
@@ -27,22 +33,21 @@ class TodoUsecase:
         - 各メソッドは適切なエラーハンドリングとバリデーションを含む必要があります
     """
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, todo_repository: TodoRepository) -> None:
+        self.todo_repository = todo_repository
 
-    def get_todos(self) -> dict:
+    def get_todos(self) -> list[TodoRead]:
         """全てのTodoを取得する。
 
         Returns:
-            dict: 全てのTodoを含む辞書。
-                現在の実装では {"message": "Get all todos"} を返す。
+            list[TodoRead]: 全てのTodoを含むリスト。
 
         Raises:
             将来的には適切な例外を発生させる予定。
         """
-        return {"message": "Get all todos"}
+        return self.todo_repository.get_all_todos()
 
-    def get_todo(self, todo_id: int) -> dict:
+    def get_todo(self, todo_id: int) -> TodoRead:
         """指定されたIDのTodoを取得する。
 
         Args:
@@ -55,9 +60,9 @@ class TodoUsecase:
         Raises:
             将来的には適切な例外を発生させる予定（例：TodoNotFound）。
         """
-        return {"message": f"Get a todo {todo_id}"}
+        return self.todo_repository.get_todo(todo_id)
 
-    def create_todo(self) -> dict:
+    def create_todo(self, todo_create: TodoCreate) -> TodoRead:
         """新しいTodoを作成する。
 
         Returns:
@@ -67,13 +72,14 @@ class TodoUsecase:
         Raises:
             将来的には適切な例外を発生させる予定。
         """
-        return {"message": "Create a todo"}
+        return self.todo_repository.create_todo(todo_create)
 
-    def update_todo(self, todo_id: int) -> dict:
+    def update_todo(self, todo_id: int, todo_update: TodoUpdate) -> TodoRead:
         """指定されたIDのTodoを更新する。
 
         Args:
             todo_id (int): 更新するTodoのID。
+            todo_update (TodoUpdate): 更新するTodoの内容。
 
         Returns:
             dict: 更新結果を含む辞書。
@@ -82,9 +88,9 @@ class TodoUsecase:
         Raises:
             将来的には適切な例外を発生させる予定（例：TodoNotFound）。
         """
-        return {"message": f"Update a todo {todo_id}"}
+        return self.todo_repository.update_todo(todo_id, todo_update)
 
-    def delete_todo(self, todo_id: int) -> dict:
+    def delete_todo(self, todo_id: int) -> None:
         """指定されたIDのTodoを削除する。
 
         Args:
@@ -97,10 +103,10 @@ class TodoUsecase:
         Raises:
             将来的には適切な例外を発生させる予定（例：TodoNotFound）。
         """
-        return {"message": f"Delete a todo {todo_id}"}
+        return self.todo_repository.delete_todo(todo_id)
 
 
-def get_todoUsecase() -> TodoUsecase:
+def get_todoUsecase(todo_repository: TodoRepository = Depends(get_todo_repository)) -> TodoUsecase:
     """TodoUsecaseのインスタンスを取得する。
 
     FastAPIの依存性注入システムで使用されるファクトリー関数です。
@@ -119,4 +125,4 @@ def get_todoUsecase() -> TodoUsecase:
         >>> def get_all_todos(usecase: TodoUsecase = Depends(get_todoUsecase)):
         ...     return usecase.get_todos()
     """
-    return TodoUsecase()
+    return TodoUsecase(todo_repository)
