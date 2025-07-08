@@ -1,32 +1,17 @@
 {
 	"name": "python-devcontainer",
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-	"containerEnv": {
-		"DISPLAY": "${localEnv:DISPLAY}",
-		"PYTHONUNBUFFERED": "1",
-		"PYTHONDONTWRITEBYTECODE": "1",
-		"UV_CACHE_DIR": "${containerWorkspaceFolder}/.cache/uv",
-		"UV_LINK_MODE": "copy",
-		"UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
-		"UV_COMPILE_BYTECODE": "1"
-	},
+	"dockerComposeFile": "compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"configureZshAsDefaultShell": true
-		},
-		"ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-			"packages": "curl,wget,git,jq,ca-certificates,build-essential,ripgrep"
-		},
 		"ghcr.io/va-h/devcontainers-features/uv:1": {
 			"shellAutocompletion": true
 		},
-		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 	"runArgs": [
-		"--init",
-		"--rm"
+		"--init"
 	],
 	"hostRequirements": {
 		"gpu": "optional"
@@ -46,9 +31,6 @@
 			]
 		}
 	},
-	"mounts": [
-		"source=claude-code-config,target=/home/vscode/.claude,type=volume"
-	],
-	"postCreateCommand": "uv sync",
+	"postCreateCommand": "uv sync --dev",
 	"postStartCommand": "uv run pre-commit install"
 }

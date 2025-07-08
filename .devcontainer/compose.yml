@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - claude-code-config:/home/vscode/.claude
+    environment:
+      DISPLAY: "${DISPLAY:-}"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      UV_CACHE_DIR: "/workspace/.cache/uv"
+      UV_LINK_MODE: "copy"
+      UV_PROJECT_ENVIRONMENT: "/home/vscode/.venv"
+      UV_COMPILE_BYTECODE: "1"
+    # Keep container running
+    command: sleep infinity
+
+volumes:
+  claude-code-config: 
