@@ -63,6 +63,8 @@ def run_migrations_online() -> None:
     config.set_section_option("alembic", "POSTGRES_USER", os.environ["POSTGRES_USER"])
     config.set_section_option("alembic", "POSTGRES_PASSWORD", os.environ["POSTGRES_PASSWORD"])
     config.set_section_option("alembic", "POSTGRES_DB", os.environ["POSTGRES_DB"])
+    config.set_section_option("alembic", "POSTGRES_SERVER", os.environ["POSTGRES_SERVER"])
+    config.set_section_option("alembic", "POSTGRES_PORT", os.environ["POSTGRES_PORT"])
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
