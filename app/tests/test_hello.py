@@ -1,4 +1,4 @@
-from my_package import hello
+from app import hello
 
 
 def test_hello() -> None:
