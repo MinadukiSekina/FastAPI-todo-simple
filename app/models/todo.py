@@ -1,0 +1,65 @@
+"""
+Todoアプリケーションのデータモデル定義
+
+このモジュールはSQLModelを使用してTodoアイテムのデータベースモデルと
+API用のPydanticモデルを定義します。
+"""
+
+from sqlmodel import Field, SQLModel
+
+
+class TodoBase(SQLModel):
+    """
+    Todoアイテムの基本データ構造
+
+    全てのTodoモデルで共通して使用される、基本的なフィールドを定義します。
+    """
+
+    title: str  # Todoアイテムのタイトル
+    description: str  # Todoアイテムの詳細説明
+    completed: bool = False  # 完了状態（デフォルト: False）
+
+
+class Todo(TodoBase, table=True):
+    """
+    データベーステーブル用のTodoモデル
+
+    実際のデータベーステーブルとして使用されるモデルです。
+    SQLModelの`table=True`によってテーブルとして認識されます。
+    """
+
+    id: int | None = Field(default=None, primary_key=True)  # 主キー（自動採番）
+
+
+class TodoCreate(TodoBase):
+    """
+    Todo作成時のリクエストモデル
+
+    新しいTodoアイテムを作成する際のAPIリクエストで使用されます。
+    idフィールドは含まれません（自動採番のため）。
+    """
+
+    pass
+
+
+class TodoRead(TodoBase):
+    """
+    Todo読み取り用のレスポンスモデル
+
+    APIレスポンスでTodoアイテムを返す際に使用されます。
+    idフィールドが含まれます。
+    """
+
+    id: int  # Todoアイテムの一意識別子
+
+
+class TodoUpdate(TodoBase):
+    """
+    Todo更新時のリクエストモデル
+
+    既存のTodoアイテムを更新する際のAPIリクエストで使用されます。
+    """
+
+    title: str | None = None  # 更新するタイトル
+    description: str | None = None  # 更新する説明
+    completed: bool | None = None  # 更新する完了状態
