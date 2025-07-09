@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.models.todo import TodoCreate, TodoRead, TodoUpdate
-from app.repositories.todoRepository import TodoRepository, get_todo_repository
+from app.repositories.todoRepository import TodoRepository
 
 
 class TodoUsecase:
@@ -32,7 +32,7 @@ class TodoUsecase:
         - 各メソッドは適切なエラーハンドリングとバリデーションを含みます
     """
 
-    def __init__(self, todo_repository: TodoRepository) -> None:
+    def __init__(self, todo_repository: TodoRepository = Depends(TodoRepository)) -> None:
         """TodoUsecaseを初期化します。
 
         Args:
@@ -124,26 +124,3 @@ class TodoUsecase:
             データベースアクセスエラーなどの例外が発生する可能性があります。
         """
         return self.todo_repository.delete_todo(todo_id)
-
-
-def get_todoUsecase(todo_repository: TodoRepository = Depends(get_todo_repository)) -> TodoUsecase:
-    """TodoUsecaseのインスタンスを取得する。
-
-    FastAPIの依存性注入システムで使用されるファクトリー関数です。
-    TodoRepositoryの依存性注入を通じて、TodoUsecaseのインスタンスを作成します。
-
-    Args:
-        todo_repository (TodoRepository): 依存性注入により提供されるTodoRepository
-
-    Returns:
-        TodoUsecase: TodoUsecaseのインスタンス。
-
-    Examples:
-        FastAPIルーターでの使用例:
-        >>> from fastapi import Depends
-        >>>
-        >>> @router.get("/todos")
-        >>> def get_all_todos(usecase: TodoUsecase = Depends(get_todoUsecase)):
-        ...     return usecase.get_todos()
-    """
-    return TodoUsecase(todo_repository)

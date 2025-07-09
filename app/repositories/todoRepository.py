@@ -12,7 +12,7 @@ class TodoRepository:
     このクラスはTodoアイテムのCRUD操作（作成、読み取り、更新、削除）を提供します。
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: Session = Depends(get_session)) -> None:
         """
         TodoRepositoryを初期化します
 
@@ -120,16 +120,3 @@ class TodoRepository:
         # データベースから削除
         self.session.delete(todo)
         self.session.commit()
-
-
-def get_todo_repository(session: Session = Depends(get_session)) -> TodoRepository:
-    """
-    TodoRepositoryのインスタンスを取得するための依存性注入関数
-
-    Args:
-        session: データベースセッション（依存性注入により自動的に提供される）
-
-    Returns:
-        TodoRepository: TodoRepositoryのインスタンス
-    """
-    return TodoRepository(session)
