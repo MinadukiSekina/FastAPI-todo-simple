@@ -104,6 +104,52 @@ class TestTodoRepositorySuccessCases:
         assert todo == expected_todo
 
     # =============================================================================
+    # _get_todo_by_id()の異常ケースのテスト
+    # =============================================================================
+
+    # _get_todo_by_id()の異常ケースのテスト用データ
+    _get_todo_by_id_error_data: ClassVar[list[ParameterSet]] = [
+        pytest.param(
+            1,
+            [TodoCreate(title="test", description="test", completed=False)],
+            Todo(id=1, title="test", description="test", completed=False),
+            id="get_todo",
+        ),
+        pytest.param(
+            2,
+            [
+                TodoCreate(title="test", description="test", completed=False),
+                TodoCreate(title="test2", description="test2", completed=False),
+            ],
+            Todo(id=2, title="test2", description="test2", completed=False),
+            id="get_todo_multiple",
+        ),
+    ]
+
+    # _get_todo_by_id()の正常ケースのテスト
+    @pytest.mark.parametrize(
+        "todo_id, create_test_todo_data, expected_todo",
+        _get_todo_by_id_error_data,
+        indirect=["create_test_todo_data"],
+    )
+    def test_get_todo_by_id_success_cases(
+        self,
+        get_test_session: Session,
+        todo_id: int,
+        create_test_todo_data: list[Todo],
+        expected_todo: Todo,
+    ) -> None:
+        """_get_todo_by_id()をテスト"""
+        # リポジトリを作成
+        repository = TodoRepository(get_test_session)
+
+        # メソッドを実行
+        todo = repository._get_todo_by_id(todo_id)
+
+        # 結果を検証
+        assert todo == expected_todo
+
+    # =============================================================================
     # get_todo()の正常ケースのテスト
     # =============================================================================
 
@@ -309,6 +355,22 @@ class TestTodoRepositoryErrorCases:
         pytest.param(0, "Todo with id 0 not found", id="invalid_id"),
         pytest.param(-1, "Todo with id -1 not found", id="negative_id"),
     ]
+
+    # =============================================================================
+    # _get_todo_by_id()の異常ケースのテスト
+    # =============================================================================
+    @pytest.mark.parametrize("todo_id, error_message", todo_error_data)
+    def test_get_todo_by_id_error_cases(
+        self,
+        get_test_session: Session,
+        todo_id: int,
+        error_message: str,
+    ) -> None:
+        """_get_todo_by_id()の異常ケースのテスト"""
+        repository = TodoRepository(get_test_session)
+
+        with pytest.raises(ValueError, match=error_message):
+            repository._get_todo_by_id(todo_id)
 
     # =============================================================================
     # get_todo()の異常ケースのテスト
