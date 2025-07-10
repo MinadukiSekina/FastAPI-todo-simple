@@ -9,6 +9,10 @@ dependencies = [
     "alembic>=1.16.2",
     "fastapi[standard]>=0.116.0",
     "psycopg2-binary>=2.9.10",
+    "psycopg[binary]>=3.2.9",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "pytest-postgresql>=7.0.2",
     "sqlmodel>=0.0.24",
 ]
 
@@ -81,3 +85,16 @@ unfixable = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["app/tests"]
+addopts = "--cov=app --cov-report=term --cov-report=html"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "tests/*",
+    "*/*_test.py",
+    "*/test_*.py",
+]

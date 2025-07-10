@@ -52,6 +52,24 @@ class TodoRepository:
         # 保存後のデータで表示用のモデルを返却
         return TodoRead.model_validate(new_todo)
 
+    def _get_todo_by_id(self, todo_id: int) -> Todo:
+        """
+        指定されたIDのTodoアイテムを取得します
+
+        Args:
+            todo_id: 取得するTodoアイテムのID
+
+        Returns:
+            Todo: 指定されたTodoアイテム
+
+        Raises:
+            ValueError: 指定されたIDのTodoアイテムが見つからない場合
+        """
+        todo = self.session.get(Todo, todo_id)
+        if not todo:
+            raise ValueError(f"Todo with id {todo_id} not found")
+        return todo
+
     def get_todo(self, todo_id: int) -> TodoRead:
         """
         指定されたIDのTodoアイテムを取得します
@@ -61,8 +79,11 @@ class TodoRepository:
 
         Returns:
             TodoRead: 指定されたTodoアイテム
+
+        Raises:
+            ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
-        todo = self.session.get(Todo, todo_id)
+        todo = self._get_todo_by_id(todo_id)
         return TodoRead.model_validate(todo)
 
     def update_todo(self, todo_id: int, todo: TodoUpdate) -> TodoRead:
@@ -80,11 +101,7 @@ class TodoRepository:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
         # 対象データの取得
-        target = self.session.get(Todo, todo_id)
-
-        # 存在チェック
-        if not target:
-            raise ValueError(f"Todo with id {todo_id} not found")
+        target = self._get_todo_by_id(todo_id)
 
         # 更新するデータの取得
         update_data = todo.model_dump(exclude_unset=True)
@@ -111,11 +128,7 @@ class TodoRepository:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
         # 対象データの取得
-        todo = self.session.get(Todo, todo_id)
-
-        # 存在チェック
-        if not todo:
-            raise ValueError(f"Todo with id {todo_id} not found")
+        todo = self._get_todo_by_id(todo_id)
 
         # データベースから削除
         self.session.delete(todo)

@@ -5,6 +5,7 @@ Todoアプリケーションのデータモデル定義
 API用のPydanticモデルを定義します。
 """
 
+from pydantic import ValidationInfo, field_validator
 from sqlmodel import Field, SQLModel
 
 
@@ -39,7 +40,13 @@ class TodoCreate(TodoBase):
     idフィールドは含まれません（自動採番のため）。
     """
 
-    pass
+    @field_validator("title", "description")
+    @classmethod
+    def validate_title(cls, v: str, info: ValidationInfo) -> str:
+        """タイトルが空文字列でないことを検証する"""
+        if not v or v.strip() == "":
+            raise ValueError(f"{info.field_name} is required")
+        return v
 
 
 class TodoRead(TodoBase):
@@ -63,3 +70,15 @@ class TodoUpdate(TodoBase):
     title: str | None = None  # 更新するタイトル
     description: str | None = None  # 更新する説明
     completed: bool | None = None  # 更新する完了状態
+
+    @field_validator("title", "description")
+    @classmethod
+    def validate_string_field(cls, v: str | None, info: ValidationInfo) -> str | None:
+        """タイトルと説明のバリデーション"""
+        # 明示的にNoneが送信された場合はエラー
+        if v is None:
+            raise ValueError(f"{info.field_name} cannot be null")
+        # 空文字列や空白のみの場合もエラー
+        if not v or not v.strip():
+            raise ValueError(f"{info.field_name} is required")
+        return v
