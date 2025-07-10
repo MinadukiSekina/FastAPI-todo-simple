@@ -253,7 +253,7 @@ class TestTodoRouterSuccessCases:
 
         # 結果を検証
         assert response.status_code == 200
-        assert response.json() is None
+        assert response.json() is True
 
 
 class TestTodoRouterErrorCases:

@@ -283,12 +283,11 @@ class TestTodoRepositorySuccessCases:
     # delete_todo()の正常ケースのテスト
     # =============================================================================
     @pytest.mark.parametrize(
-        "todo_id, create_test_todo_data, expected_todo",
+        "todo_id, create_test_todo_data",
         [
             pytest.param(
                 1,
                 [TodoCreate(title="test", description="test", completed=False)],
-                None,
                 id="delete_todo_in_single_todo",
             ),
             pytest.param(
@@ -297,7 +296,6 @@ class TestTodoRepositorySuccessCases:
                     TodoCreate(title="test", description="test", completed=False),
                     TodoCreate(title="test2", description="test2", completed=False),
                 ],
-                None,
                 id="delete_todo_in_multiple_todos",
             ),
         ],
@@ -308,16 +306,18 @@ class TestTodoRepositorySuccessCases:
         get_test_session: Session,
         todo_id: int,
         create_test_todo_data: list[Todo],
-        expected_todo: None,
     ) -> None:
         """delete_todo()をテスト"""
         # リポジトリを作成
         repository = TodoRepository(get_test_session)
 
         # メソッドを実行
-        repository.delete_todo(todo_id)
+        result = repository.delete_todo(todo_id)
 
-        # 結果を検証
+        # 戻り値の検証：Trueが返されることを確認
+        assert result is True
+
+        # 削除の検証：対象のTodoが実際に削除されていることを確認
         with pytest.raises(ValueError):
             repository.get_todo(todo_id)
 
