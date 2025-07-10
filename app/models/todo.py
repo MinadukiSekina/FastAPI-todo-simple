@@ -73,8 +73,12 @@ class TodoUpdate(TodoBase):
 
     @field_validator("title", "description")
     @classmethod
-    def validate_title(cls, v: str | None, info: ValidationInfo) -> str | None:
-        """タイトルが空文字列でないことを検証する"""
-        if v is not None and (not v or not v.strip()):
+    def validate_string_field(cls, v: str | None, info: ValidationInfo) -> str | None:
+        """タイトルと説明のバリデーション"""
+        # 明示的にNoneが送信された場合はエラー
+        if v is None:
+            raise ValueError(f"{info.field_name} cannot be null")
+        # 空文字列や空白のみの場合もエラー
+        if not v or not v.strip():
             raise ValueError(f"{info.field_name} is required")
         return v
