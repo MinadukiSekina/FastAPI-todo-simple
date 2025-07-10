@@ -12,12 +12,28 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     
-    # GitHub Secretsを使用
+    # PostgreSQLサービスを追加
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    # 環境変数
     env:
       POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
-      POSTGRES_SERVER: ${{ secrets.TEST_POSTGRES_SERVER }}
-      POSTGRES_PORT: ${{ secrets.TEST_POSTGRES_PORT }}
+      POSTGRES_SERVER: localhost
+      POSTGRES_PORT: 5432
       POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
     
     steps:
