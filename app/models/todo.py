@@ -70,3 +70,11 @@ class TodoUpdate(TodoBase):
     title: str | None = None  # 更新するタイトル
     description: str | None = None  # 更新する説明
     completed: bool | None = None  # 更新する完了状態
+
+    @field_validator("title", "description")
+    @classmethod
+    def validate_title(cls, v: str | None, info: ValidationInfo) -> str | None:
+        """タイトルが空文字列でないことを検証する"""
+        if v is not None and (not v or not v.strip()):
+            raise ValueError(f"{info.field_name} is required")
+        return v
