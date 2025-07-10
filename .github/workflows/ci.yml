@@ -11,6 +11,15 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    
+    # GitHub Secretsを使用
+    env:
+      POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+      POSTGRES_SERVER: ${{ secrets.TEST_POSTGRES_SERVER }}
+      POSTGRES_PORT: ${{ secrets.TEST_POSTGRES_PORT }}
+      POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
+    
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
