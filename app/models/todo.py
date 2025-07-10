@@ -5,6 +5,7 @@ Todoアプリケーションのデータモデル定義
 API用のPydanticモデルを定義します。
 """
 
+from pydantic import ValidationInfo, field_validator
 from sqlmodel import Field, SQLModel
 
 
@@ -39,7 +40,13 @@ class TodoCreate(TodoBase):
     idフィールドは含まれません（自動採番のため）。
     """
 
-    pass
+    @field_validator("title", "description")
+    @classmethod
+    def validate_title(cls, v: str, info: ValidationInfo) -> str:
+        """タイトルが空文字列でないことを検証する"""
+        if not v or v.strip() == "":
+            raise ValueError(f"{info.field_name} is required")
+        return v
 
 
 class TodoRead(TodoBase):
