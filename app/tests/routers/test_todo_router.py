@@ -2,11 +2,14 @@ import pytest
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
+from pytest_mock import MockerFixture
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
 
 from app.infrastructure.db import get_session
 from app.models.todo import Todo, TodoCreate, TodoRead, TodoUpdate
 from app.routers.todo import router
+from app.usecases.todoUsecase import TodoUsecase
 
 
 def get_test_app(session: Session) -> FastAPI:
@@ -429,3 +432,65 @@ class TestTodoRouterErrorCases:
         # バリデーションエラーメッセージを確認
         error_detail = response.json()["detail"]
         assert any(expected_error_message in str(error) for error in error_detail)
+
+    # =============================================================================
+    # POST /todos エンドポイントのIntegrityErrorケースのテスト
+    # =============================================================================
+    def test_create_todo_integrity_error(
+        self,
+        get_test_session: Session,
+        mocker: MockerFixture,
+    ) -> None:
+        """POST /todos エンドポイントのIntegrityErrorテスト"""
+        # モックのTodoUsecaseを作成
+        mock_usecase = mocker.Mock(spec=TodoUsecase)
+        mock_usecase.create_todo.side_effect = IntegrityError(
+            "INSERT statement failed", "params", orig=Exception("Original error")
+        )
+
+        # アプリケーションを作成し、依存関係を上書き
+        app = get_test_app(get_test_session)
+        app.dependency_overrides[TodoUsecase] = lambda: mock_usecase
+        client = TestClient(app)
+
+        # APIを呼び出し
+        todo_create = TodoCreate(title="test", description="test", completed=False)
+        response = client.post("/todos", json=jsonable_encoder(todo_create))
+
+        # 結果を検証
+        assert response.status_code == 400
+        assert response.json() == {
+            "detail": "Failed to create todo due to data constraint violation"
+        }
+
+    # =============================================================================
+    # PUT /todos/{todo_id} エンドポイントのIntegrityErrorケースのテスト
+    # =============================================================================
+    def test_update_todo_integrity_error(
+        self,
+        get_test_session: Session,
+        mocker: MockerFixture,
+    ) -> None:
+        """PUT /todos/{todo_id} エンドポイントのIntegrityErrorテスト"""
+        # モックのTodoUsecaseを作成
+        mock_usecase = mocker.Mock(spec=TodoUsecase)
+        mock_usecase.update_todo.side_effect = IntegrityError(
+            "UPDATE statement failed", "params", orig=Exception("Original error")
+        )
+
+        # アプリケーションを作成し、依存関係を上書き
+        app = get_test_app(get_test_session)
+        app.dependency_overrides[TodoUsecase] = lambda: mock_usecase
+        client = TestClient(app)
+
+        # APIを呼び出し
+        todo_update = TodoUpdate(title="updated")
+        response = client.put(
+            "/todos/1", json=jsonable_encoder(todo_update.model_dump(exclude_unset=True))
+        )
+
+        # 結果を検証
+        assert response.status_code == 400
+        assert response.json() == {
+            "detail": "Failed to update todo due to data constraint violation"
+        }
