@@ -171,13 +171,13 @@ def test_delete_todo_success_cases(mocker: MockerFixture, todo_id: int) -> None:
     """delete_todo()の正常ケースをテスト"""
     # モックを作成
     mock_repository = mocker.Mock()
-    mock_repository.delete_todo.return_value = None
+    mock_repository.delete_todo.return_value = True
     # モックを使用してUsecaseを作成
     usecase = TodoUsecase(mock_repository)
     # メソッドを実行
     result = usecase.delete_todo(todo_id)
     # 結果を検証
-    assert result is None
+    assert result is True
     # モックの呼び出しを検証
     mock_repository.delete_todo.assert_called_once_with(todo_id)
 

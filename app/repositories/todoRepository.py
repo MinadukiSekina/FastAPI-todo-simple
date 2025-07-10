@@ -117,12 +117,15 @@ class TodoRepository:
         # 更新後のデータで表示用のモデルを返却
         return TodoRead.model_validate(target)
 
-    def delete_todo(self, todo_id: int) -> None:
+    def delete_todo(self, todo_id: int) -> bool:
         """
         指定されたIDのTodoアイテムを削除します
 
         Args:
             todo_id: 削除するTodoアイテムのID
+
+        Returns:
+            bool: 削除が成功した場合True
 
         Raises:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
@@ -133,3 +136,5 @@ class TodoRepository:
         # データベースから削除
         self.session.delete(todo)
         self.session.commit()
+
+        return True
