@@ -117,8 +117,8 @@ class TestTodoSuccessCases:
             ),
         ],
     )
-    def test_valid_todo_with_id(self, args: dict[str, Any], expected: Todo) -> None:
-        """IDを指定したTodoの作成をテスト"""
+    def test_valid_todo(self, args: dict[str, Any], expected: Todo) -> None:
+        """有効なTodoの作成をテスト"""
         todo = Todo(**args)
 
         assert todo == expected
@@ -129,31 +129,41 @@ class TestTodoCreateSuccessCases:
 
     # TodoCreate作成時の正常ケース
     @pytest.mark.parametrize(
-        "title, description, completed",
+        "args, expected",
         [
             pytest.param(
-                "test title1", "test description1", False, id="valid_todo_create_no_completed"
+                {
+                    "title": "test title1",
+                    "description": "test description1",
+                    "completed": False,
+                },
+                TodoCreate(title="test title1", description="test description1", completed=False),
+                id="valid_todo_create_no_completed",
             ),
             pytest.param(
-                "test title2", "test description2", True, id="valid_todo_create_completed"
+                {
+                    "title": "test title2",
+                    "description": "test description2",
+                    "completed": True,
+                },
+                TodoCreate(title="test title2", description="test description2", completed=True),
+                id="valid_todo_create_completed",
+            ),
+            pytest.param(
+                {
+                    "title": "test title3",
+                    "description": "test description3",
+                },
+                TodoCreate(title="test title3", description="test description3", completed=False),
+                id="valid_todo_create_default_completed",
             ),
         ],
     )
-    def test_valid_todo_create(self, title: str, description: str, completed: bool) -> None:
+    def test_valid_todo_create(self, args: dict[str, Any], expected: TodoCreate) -> None:
         """有効なTodoCreateの作成をテスト"""
-        # 正常なデータ
-        todo_create = TodoCreate(title=title, description=description, completed=completed)
+        todo_create = TodoCreate(**args)
 
-        assert todo_create.title == title
-        assert todo_create.description == description
-        assert todo_create.completed is completed
-
-    # TodoCreate作成時のcompletedのデフォルト値をテスト
-    def test_default_completed_value(self) -> None:
-        """completedのデフォルト値をテスト"""
-        todo_create = TodoCreate(title="test title", description="test description")
-
-        assert todo_create.completed is False
+        assert todo_create == expected
 
 
 class TestTodoCreate_ErrorCases:
@@ -161,57 +171,58 @@ class TestTodoCreate_ErrorCases:
 
     # タイトルが必須であることをテスト
     @pytest.mark.parametrize(
-        "title, description, completed, error_message",
+        "args, error_message",
         [
-            pytest.param("", "test", False, "title is required", id="empty_title"),
-            pytest.param("   ", "test", False, "title is required", id="whitespace_only_title"),
-            # 型エラーメッセージを期待
-            pytest.param(None, "test", False, "Input should be a valid string", id="none_title"),
+            # 空文字列のタイトル
+            pytest.param(
+                {"title": "", "description": "test description", "completed": False},
+                "title is required",
+                id="empty_string_title",
+            ),
+            # スペースのみのタイトル
+            pytest.param(
+                {"title": "   ", "description": "test description", "completed": False},
+                "title is required",
+                id="whitespace_only_title",
+            ),
+            # 型エラーメッセージを期待（タイトル）
+            pytest.param(
+                {"title": None, "description": "test description", "completed": False},
+                "Input should be a valid string",
+                id="none_title",
+            ),
+            # 空文字列の説明
+            pytest.param(
+                {"title": "test title", "description": "", "completed": False},
+                "description is required",
+                id="empty_description",
+            ),
+            # スペースのみの説明
+            pytest.param(
+                {"title": "test title", "description": "   ", "completed": False},
+                "description is required",
+                id="whitespace_only_description",
+            ),
+            # 型エラーメッセージを期待（説明）
+            pytest.param(
+                {"title": "test title", "description": None, "completed": False},
+                "Input should be a valid string",
+                id="none_description",
+            ),
         ],
     )
     def test_title_validation(
         self,
-        title: str,
-        description: str,
-        completed: bool,
+        args: dict[str, Any],
         error_message: str,
     ) -> None:
         """
-        タイトルが必須であることをテスト
+        必須項目が空にならないことをテスト
 
-        空文字列、スペースのみのタイトルは無効です。
-        """
-        # 空文字列のタイトル
-        with pytest.raises(ValidationError, match=error_message):
-            TodoCreate(title=title, description=description, completed=completed)
-
-    # 説明が必須であることをテスト
-    @pytest.mark.parametrize(
-        "title, description, completed, error_message",
-        [
-            pytest.param("test", "", False, "description is required", id="empty_description"),
-            pytest.param(
-                "test", "   ", False, "description is required", id="whitespace_only_description"
-            ),
-            pytest.param(
-                "test", None, False, "Input should be a valid string", id="none_description"
-            ),
-        ],
-    )
-    def test_description_validation(
-        self,
-        title: str,
-        description: str,
-        completed: bool,
-        error_message: str,
-    ) -> None:
-        """
-        説明が必須であることをテスト
-
-        空文字列、スペースのみの説明は無効です。
+        空文字列、スペースのみのタイトル・説明は無効です。
         """
         with pytest.raises(ValidationError, match=error_message):
-            TodoCreate(title=title, description=description, completed=completed)
+            TodoCreate(**args)
 
 
 class TestTodoReadSuccessCases:
@@ -365,6 +376,10 @@ class TestTodoUpdateErrorCases:
         ],
     )
     def test_empty_string_title(self, args: dict[str, Any], expected: str) -> None:
-        """空文字列のタイトルをテスト"""
+        """
+        必須項目が空にならないことをテスト
+
+        空文字列、スペースのみのタイトル・説明は無効です。
+        """
         with pytest.raises(ValidationError, match=expected):
             TodoUpdate(**args)
