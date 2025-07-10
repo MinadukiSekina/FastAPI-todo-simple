@@ -12,16 +12,10 @@ class TestTodoCreateSuccessCases:
         "title, description, completed",
         [
             pytest.param(
-                "test title1",
-                "test description1",
-                False,
-                id="valid_todo_create_no_completed",
+                "test title1", "test description1", False, id="valid_todo_create_no_completed"
             ),
             pytest.param(
-                "test title2",
-                "test description2",
-                True,
-                id="valid_todo_create_completed",
+                "test title2", "test description2", True, id="valid_todo_create_completed"
             ),
         ],
     )
@@ -49,8 +43,8 @@ class TestTodoCreate_ErrorCases:
     @pytest.mark.parametrize(
         "title, description, completed, error_message",
         [
-            pytest.param("", "test", False, "Title is required", id="empty_title"),
-            pytest.param("   ", "test", False, "Title is required", id="whitespace_only_title"),
+            pytest.param("", "test", False, "title is required", id="empty_title"),
+            pytest.param("   ", "test", False, "title is required", id="whitespace_only_title"),
             # 型エラーメッセージを期待
             pytest.param(None, "test", False, "Input should be a valid string", id="none_title"),
         ],
