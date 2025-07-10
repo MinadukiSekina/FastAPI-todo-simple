@@ -108,7 +108,7 @@ class TodoUsecase:
         """
         return self.todo_repository.update_todo(todo_id, todo_update)
 
-    def delete_todo(self, todo_id: int) -> None:
+    def delete_todo(self, todo_id: int) -> bool:
         """指定されたIDのTodoを削除する。
 
         指定されたIDのTodoアイテムをデータベースから削除します。
@@ -117,7 +117,7 @@ class TodoUsecase:
             todo_id (int): 削除するTodoのID。
 
         Returns:
-            None: 削除完了後は何も返しません。
+            bool: 削除が成功した場合True
 
         Raises:
             ValueError: 指定されたIDのTodoが見つからない場合

@@ -45,8 +45,8 @@ def update_todo(
         )
 
 
-@router.delete("/{todo_id}", response_model=None)
-def delete_todo(todo_id: int, todo_usecase: TodoUsecase = Depends()) -> None:
+@router.delete("/{todo_id}", response_model=bool)
+def delete_todo(todo_id: int, todo_usecase: TodoUsecase = Depends()) -> bool:
     try:
         return todo_usecase.delete_todo(todo_id)
     except ValueError as e:
