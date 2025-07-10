@@ -300,7 +300,7 @@ class TestTodoUpdateSuccessCases:
                 {
                     "title": "updated title",
                 },
-                TodoUpdate(title="updated title", description=None, completed=None),
+                TodoUpdate(title="updated title"),
                 id="valid_todo_update_title_only",
             ),
             # 説明のみの更新
@@ -308,7 +308,7 @@ class TestTodoUpdateSuccessCases:
                 {
                     "description": "updated description",
                 },
-                TodoUpdate(title=None, description="updated description", completed=None),
+                TodoUpdate(description="updated description"),
                 id="valid_todo_update_description_only",
             ),
             # 完了状態のみの更新
@@ -316,7 +316,7 @@ class TestTodoUpdateSuccessCases:
                 {
                     "completed": True,
                 },
-                TodoUpdate(title=None, description=None, completed=True),
+                TodoUpdate(completed=True),
                 id="valid_todo_update_completed",
             ),
             # 全フィールドの更新
@@ -334,7 +334,7 @@ class TestTodoUpdateSuccessCases:
             # 更新対象なし
             pytest.param(
                 {},
-                TodoUpdate(title=None, description=None, completed=None),
+                TodoUpdate(),
                 id="valid_todo_update_no_fields",
             ),
         ],
@@ -353,6 +353,7 @@ class TestTodoUpdateErrorCases:
     @pytest.mark.parametrize(
         "args, expected",
         [
+            # 空文字列のテスト
             pytest.param(
                 {"title": ""},
                 "title is required",
@@ -373,13 +374,24 @@ class TestTodoUpdateErrorCases:
                 "description is required",
                 id="whitespace_only_description",
             ),
+            # 明示的なNone値のテスト
+            pytest.param(
+                {"title": None},
+                "title cannot be null",
+                id="explicit_none_title",
+            ),
+            pytest.param(
+                {"description": None},
+                "description cannot be null",
+                id="explicit_none_description",
+            ),
         ],
     )
-    def test_empty_string_title(self, args: dict[str, Any], expected: str) -> None:
+    def test_validation_errors(self, args: dict[str, Any], expected: str) -> None:
         """
-        必須項目が空にならないことをテスト
+        バリデーションエラーのテスト
 
-        空文字列、スペースのみのタイトル・説明は無効です。
+        空文字列、スペースのみ、明示的なNone値は無効です。
         """
         with pytest.raises(ValidationError, match=expected):
             TodoUpdate(**args)
