@@ -1,21 +1,19 @@
 """first migration
 
-Revision ID: c07dcc0e0192
+Revision ID: a115e4ad9c38
 Revises:
-Create Date: 2025-07-08 08:20:25.443254
+Create Date: 2025-07-11 02:30:16.067028
 
 """
 
-# ruff: noqa
 from collections.abc import Sequence
-from typing import Union
 
 import sqlalchemy as sa
-import sqlmodel
+import sqlmodel.sql.sqltypes
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "c07dcc0e0192"
+revision: str = "a115e4ad9c38"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
