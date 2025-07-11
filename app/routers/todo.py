@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 
 from app.models.todo import TodoCreate, TodoRead, TodoUpdate
-from app.usecases.todoUsecase import TodoUsecase
+from app.usecases.todo_usecase import TodoUsecase
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 

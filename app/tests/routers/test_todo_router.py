@@ -9,7 +9,7 @@ from sqlmodel import Session
 from app.infrastructure.db import get_session
 from app.models.todo import Todo, TodoCreate, TodoRead, TodoUpdate
 from app.routers.todo import router
-from app.usecases.todoUsecase import TodoUsecase
+from app.usecases.todo_usecase import TodoUsecase
 
 
 def get_test_app(session: Session) -> FastAPI:

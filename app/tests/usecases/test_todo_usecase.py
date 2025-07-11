@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from app.models.todo import TodoCreate, TodoRead, TodoUpdate
-from app.usecases.todoUsecase import TodoUsecase
+from app.usecases.todo_usecase import TodoUsecase
 
 # =============================================================================
 # 正常ケースのテスト

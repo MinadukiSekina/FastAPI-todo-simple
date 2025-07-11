@@ -5,7 +5,7 @@ from _pytest.mark import ParameterSet
 from sqlmodel import Session
 
 from app.models.todo import Todo, TodoCreate, TodoRead, TodoUpdate
-from app.repositories.todoRepository import TodoRepository
+from app.repositories.todo_repository import TodoRepository
 
 # =============================================================================
 # 正常ケースのテスト
