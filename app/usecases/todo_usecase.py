@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.models.todo import TodoCreate, TodoRead, TodoUpdate
-from app.repositories.todoRepository import TodoRepository
+from app.repositories.todo_repository import TodoRepository
 
 
 class TodoUsecase:
