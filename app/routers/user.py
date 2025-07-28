@@ -7,7 +7,7 @@
 
 from fastapi import APIRouter, Depends
 
-from app.models.user import UserBase, UserRead
+from app.models.user import UserBase, UserCreate, UserRead
 from app.usecases.user_usecase import UserUsecase
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -26,6 +26,26 @@ async def get_users(
         list[UserRead]: 全てのユーザーのリスト
     """
     return user_usecase.get_users()
+
+
+@router.post("/", response_model=UserRead)
+async def register_user(
+    user_create: UserCreate,
+    user_usecase: UserUsecase = Depends(),
+) -> UserRead:
+    """新しいユーザーを登録する。
+
+    Args:
+        user_create (UserCreate): 作成するユーザーの情報
+        user_usecase (UserUsecase): ユーザー管理ユースケース
+
+    Returns:
+        UserRead: 作成されたユーザー
+
+    Raises:
+        HTTPException: ユーザー作成に失敗した場合
+    """
+    return user_usecase.create_user(user_create)
 
 
 @router.get("/{user_id}", response_model=UserRead)

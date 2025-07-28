@@ -12,9 +12,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.dependencies.auth import get_current_active_user_read
 from app.models.token import Token
-from app.models.user import UserCreate, UserRead
+from app.models.user import UserRead
 from app.usecases.auth_usecase import AuthUsecase
-from app.usecases.user_usecase import UserUsecase
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -46,26 +45,6 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return auth_usecase.create_access_token_for_user(user)
-
-
-@router.post("/register", response_model=UserRead)
-async def register_user(
-    user_create: UserCreate,
-    user_usecase: UserUsecase = Depends(),
-) -> UserRead:
-    """新しいユーザーを登録する。
-
-    Args:
-        user_create (UserCreate): 作成するユーザーの情報
-        user_usecase (UserUsecase): ユーザー管理ユースケース
-
-    Returns:
-        UserRead: 作成されたユーザー
-
-    Raises:
-        HTTPException: ユーザー作成に失敗した場合
-    """
-    return user_usecase.create_user(user_create)
 
 
 @router.get("/me", response_model=UserRead)
