@@ -5,8 +5,14 @@ Todoアプリケーションのデータモデル定義
 API用のPydanticモデルを定義します。
 """
 
+from typing import TYPE_CHECKING
+
 from pydantic import ValidationInfo, field_validator
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+# 循環参照エラー回避
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class TodoBase(SQLModel):
@@ -19,6 +25,7 @@ class TodoBase(SQLModel):
     title: str  # Todoアイテムのタイトル
     description: str  # Todoアイテムの詳細説明
     completed: bool = False  # 完了状態（デフォルト: False）
+    user_id: int = Field(foreign_key="user.id")
 
 
 class Todo(TodoBase, table=True):
@@ -30,6 +37,7 @@ class Todo(TodoBase, table=True):
     """
 
     id: int | None = Field(default=None, primary_key=True)  # 主キー（自動採番）
+    user: "User" = Relationship(back_populates="todos")
 
 
 class TodoCreate(TodoBase):

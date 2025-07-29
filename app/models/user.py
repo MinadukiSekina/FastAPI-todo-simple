@@ -5,7 +5,14 @@ Todoアプリケーションのデータモデル定義（ユーザー）
 API用のPydanticモデルを定義します。
 """
 
-from sqlmodel import Field, SQLModel
+from typing import TYPE_CHECKING
+
+from sqlmodel import Field, Relationship, SQLModel
+
+# 循環参照エラー回避
+# https://sqlmodel.dokyumento.jp/tutorial/code-structure/#circular-imports-and-type-annotations
+if TYPE_CHECKING:
+    from app.models.todo import Todo
 
 
 class UserBase(SQLModel):
@@ -25,6 +32,7 @@ class User(UserBase, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
+    todos: list["Todo"] = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):

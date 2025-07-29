@@ -7,6 +7,7 @@ from sqlmodel import SQLModel
 
 # ruff: noqa
 from app.models.todo import Todo
+from app.models.user import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
