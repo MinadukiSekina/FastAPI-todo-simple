@@ -8,6 +8,7 @@ from sqlalchemy import Engine
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.models.todo import Todo
+from app.models.user import User
 
 # 環境変数を取得
 postgres_user = os.environ["POSTGRES_USER"]
@@ -52,7 +53,11 @@ def get_test_session(get_test_engine: Engine) -> Generator[Session, None, None]:
 
 
 @pytest.fixture
-def create_test_todo_data(get_test_session: Session, request: pytest.FixtureRequest) -> list[Todo]:
+def create_test_todo_data(
+    get_test_session: Session,
+    create_test_user_data: list[User],
+    request: pytest.FixtureRequest,
+) -> list[Todo]:
     """テスト用のTodoデータを作成するFixture"""
     todos = [Todo.model_validate(t) for t in request.param]
     for todo in todos:
@@ -61,3 +66,15 @@ def create_test_todo_data(get_test_session: Session, request: pytest.FixtureRequ
         get_test_session.refresh(todo)
 
     return todos
+
+
+@pytest.fixture
+def create_test_user_data(get_test_session: Session, request: pytest.FixtureRequest) -> list[User]:
+    """テスト用のUserデータを作成するFixture"""
+    users = []
+    for user_data in request.param:
+        user = User(**user_data)
+        get_test_session.add(user)
+        get_test_session.commit()
+        get_test_session.refresh(user)
+        users.append(user)
