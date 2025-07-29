@@ -14,7 +14,7 @@ from app.models.user import UserRead, UserReadWithPassword
 from app.usecases.auth_usecase import AuthUsecase
 
 # OAuth2スキームの設定
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 # ruff: noqa: RUF029
