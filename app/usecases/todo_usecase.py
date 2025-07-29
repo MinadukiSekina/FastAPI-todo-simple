@@ -40,7 +40,7 @@ class TodoUsecase:
         """
         self.todo_repository = todo_repository
 
-    def get_todos(self) -> list[TodoRead]:
+    def get_todos(self, user_id: int) -> list[TodoRead]:
         """全てのTodoを取得する。
 
         データベースから全てのTodoアイテムを取得し、
@@ -52,9 +52,9 @@ class TodoUsecase:
         Raises:
             データベースアクセスエラーなどの例外が発生する可能性があります。
         """
-        return self.todo_repository.get_all_todos()
+        return self.todo_repository.get_all_todos(user_id)
 
-    def get_todo(self, todo_id: int) -> TodoRead:
+    def get_todo(self, todo_id: int, user_id: int) -> TodoRead:
         """指定されたIDのTodoを取得する。
 
         データベースから指定されたIDのTodoアイテムを取得し、
@@ -62,6 +62,7 @@ class TodoUsecase:
 
         Args:
             todo_id (int): 取得するTodoのID。
+            user_id (int): 認証されたユーザーのID。
 
         Returns:
             TodoRead: 指定されたTodoアイテム。
@@ -70,7 +71,7 @@ class TodoUsecase:
             ValueError: 指定されたIDのTodoが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
         """
-        return self.todo_repository.get_todo(todo_id)
+        return self.todo_repository.get_todo(todo_id, user_id)
 
     def create_todo(self, todo_create: TodoCreate) -> TodoRead:
         """新しいTodoを作成する。
@@ -89,7 +90,7 @@ class TodoUsecase:
         """
         return self.todo_repository.create_todo(todo_create)
 
-    def update_todo(self, todo_id: int, todo_update: TodoUpdate) -> TodoRead:
+    def update_todo(self, todo_id: int, todo_update: TodoUpdate, user_id: int) -> TodoRead:
         """指定されたIDのTodoを更新する。
 
         指定されたIDのTodoアイテムを更新し、
@@ -98,6 +99,7 @@ class TodoUsecase:
         Args:
             todo_id (int): 更新するTodoのID。
             todo_update (TodoUpdate): 更新するTodoの内容。
+            user_id (int): 認証されたユーザーのID。
 
         Returns:
             TodoRead: 更新されたTodoアイテム。
@@ -106,15 +108,16 @@ class TodoUsecase:
             ValueError: 指定されたIDのTodoが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
         """
-        return self.todo_repository.update_todo(todo_id, todo_update)
+        return self.todo_repository.update_todo(todo_id, todo_update, user_id)
 
-    def delete_todo(self, todo_id: int) -> bool:
+    def delete_todo(self, todo_id: int, user_id: int) -> bool:
         """指定されたIDのTodoを削除する。
 
         指定されたIDのTodoアイテムをデータベースから削除します。
 
         Args:
             todo_id (int): 削除するTodoのID。
+            user_id (int): 認証されたユーザーのID。
 
         Returns:
             bool: 削除が成功した場合True
@@ -123,4 +126,4 @@ class TodoUsecase:
             ValueError: 指定されたIDのTodoが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
         """
-        return self.todo_repository.delete_todo(todo_id)
+        return self.todo_repository.delete_todo(todo_id, user_id)

@@ -21,14 +21,14 @@ class TodoRepository:
         """
         self.session = session
 
-    def get_all_todos(self) -> list[TodoRead]:
+    def get_all_todos(self, user_id: int) -> list[TodoRead]:
         """
         すべてのTodoアイテムを取得します
 
         Returns:
             list[TodoRead]: すべてのTodoアイテムのリスト
         """
-        todos = self.session.exec(select(Todo)).all()
+        todos = self.session.exec(select(Todo).where(Todo.user_id == user_id)).all()
         return [TodoRead.model_validate(todo) for todo in todos]
 
     def create_todo(self, todo: TodoCreate) -> TodoRead:
@@ -52,12 +52,13 @@ class TodoRepository:
         # 保存後のデータで表示用のモデルを返却
         return TodoRead.model_validate(new_todo)
 
-    def _get_todo_by_id(self, todo_id: int) -> Todo:
+    def _get_todo_by_id(self, todo_id: int, user_id: int) -> Todo:
         """
         指定されたIDのTodoアイテムを取得します
 
         Args:
             todo_id: 取得するTodoアイテムのID
+            user_id: ユーザーのID
 
         Returns:
             Todo: 指定されたTodoアイテム
@@ -65,17 +66,20 @@ class TodoRepository:
         Raises:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
-        todo = self.session.get(Todo, todo_id)
+        todo = self.session.exec(
+            select(Todo).where(Todo.id == todo_id, Todo.user_id == user_id)
+        ).first()
         if not todo:
             raise ValueError(f"Todo with id {todo_id} not found")
         return todo
 
-    def get_todo(self, todo_id: int) -> TodoRead:
+    def get_todo(self, todo_id: int, user_id: int) -> TodoRead:
         """
         指定されたIDのTodoアイテムを取得します
 
         Args:
             todo_id: 取得するTodoアイテムのID
+            user_id: ユーザーのID
 
         Returns:
             TodoRead: 指定されたTodoアイテム
@@ -83,16 +87,17 @@ class TodoRepository:
         Raises:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
-        todo = self._get_todo_by_id(todo_id)
+        todo = self._get_todo_by_id(todo_id, user_id)
         return TodoRead.model_validate(todo)
 
-    def update_todo(self, todo_id: int, todo: TodoUpdate) -> TodoRead:
+    def update_todo(self, todo_id: int, todo: TodoUpdate, user_id: int) -> TodoRead:
         """
         指定されたIDのTodoアイテムを更新します
 
         Args:
             todo_id: 更新するTodoアイテムのID
             todo: 更新する内容
+            user_id: ユーザーID
 
         Returns:
             TodoRead: 更新されたTodoアイテム
@@ -101,7 +106,7 @@ class TodoRepository:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
         # 対象データの取得
-        target = self._get_todo_by_id(todo_id)
+        target = self._get_todo_by_id(todo_id, user_id)
 
         # 更新するデータの取得
         update_data = todo.model_dump(exclude_unset=True)
@@ -117,12 +122,13 @@ class TodoRepository:
         # 更新後のデータで表示用のモデルを返却
         return TodoRead.model_validate(target)
 
-    def delete_todo(self, todo_id: int) -> bool:
+    def delete_todo(self, todo_id: int, user_id: int) -> bool:
         """
         指定されたIDのTodoアイテムを削除します
 
         Args:
             todo_id: 削除するTodoアイテムのID
+            user_id: ユーザーID
 
         Returns:
             bool: 削除が成功した場合True
@@ -131,7 +137,7 @@ class TodoRepository:
             ValueError: 指定されたIDのTodoアイテムが見つからない場合
         """
         # 対象データの取得
-        todo = self._get_todo_by_id(todo_id)
+        todo = self._get_todo_by_id(todo_id, user_id)
 
         # データベースから削除
         self.session.delete(todo)
