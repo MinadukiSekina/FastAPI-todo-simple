@@ -5,6 +5,9 @@ from pydantic import ValidationError
 
 from app.models.todo import Todo, TodoBase, TodoCreate, TodoRead, TodoUpdate
 
+# ruff: noqa: F401
+from app.models.user import User
+
 
 class TestTodoBaseSuccessCases:
     """TodoBaseクラスの正常ケースのテスト"""
@@ -19,11 +22,13 @@ class TestTodoBaseSuccessCases:
                     "title": "test title1",
                     "description": "test description1",
                     "completed": False,
+                    "user_id": 1,
                 },
                 TodoBase(
                     title="test title1",
                     description="test description1",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_base_no_completed",
             ),
@@ -33,11 +38,13 @@ class TestTodoBaseSuccessCases:
                     "title": "test title2",
                     "description": "test description2",
                     "completed": True,
+                    "user_id": 1,
                 },
                 TodoBase(
                     title="test title2",
                     description="test description2",
                     completed=True,
+                    user_id=1,
                 ),
                 id="valid_todo_base_completed",
             ),
@@ -46,11 +53,13 @@ class TestTodoBaseSuccessCases:
                 {
                     "title": "test title3",
                     "description": "test description3",
+                    "user_id": 1,
                 },
                 TodoBase(
                     title="test title3",
                     description="test description3",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_base_default_completed",
             ),
@@ -77,12 +86,14 @@ class TestTodoSuccessCases:
                     "title": "test title",
                     "description": "test description",
                     "completed": False,
+                    "user_id": 1,
                 },
                 Todo(
                     id=1,
                     title="test title",
                     description="test description",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_with_id",
             ),
@@ -92,12 +103,14 @@ class TestTodoSuccessCases:
                     "title": "test title",
                     "description": "test description",
                     "completed": True,
+                    "user_id": 1,
                 },
                 Todo(
                     id=None,
                     title="test title",
                     description="test description",
                     completed=True,
+                    user_id=1,
                 ),
                 id="valid_todo_without_id",
             ),
@@ -106,12 +119,14 @@ class TestTodoSuccessCases:
                 {
                     "title": "test title",
                     "description": "test description",
+                    "user_id": 1,
                 },
                 Todo(
                     id=None,
                     title="test title",
                     description="test description",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_without_id_and_completed",
             ),
@@ -136,8 +151,14 @@ class TestTodoCreateSuccessCases:
                     "title": "test title1",
                     "description": "test description1",
                     "completed": False,
+                    "user_id": 1,
                 },
-                TodoCreate(title="test title1", description="test description1", completed=False),
+                TodoCreate(
+                    title="test title1",
+                    description="test description1",
+                    completed=False,
+                    user_id=1,
+                ),
                 id="valid_todo_create_no_completed",
             ),
             pytest.param(
@@ -145,16 +166,28 @@ class TestTodoCreateSuccessCases:
                     "title": "test title2",
                     "description": "test description2",
                     "completed": True,
+                    "user_id": 1,
                 },
-                TodoCreate(title="test title2", description="test description2", completed=True),
+                TodoCreate(
+                    title="test title2",
+                    description="test description2",
+                    completed=True,
+                    user_id=1,
+                ),
                 id="valid_todo_create_completed",
             ),
             pytest.param(
                 {
                     "title": "test title3",
                     "description": "test description3",
+                    "user_id": 1,
                 },
-                TodoCreate(title="test title3", description="test description3", completed=False),
+                TodoCreate(
+                    title="test title3",
+                    description="test description3",
+                    completed=False,
+                    user_id=1,
+                ),
                 id="valid_todo_create_default_completed",
             ),
         ],
@@ -175,37 +208,67 @@ class TestTodoCreate_ErrorCases:
         [
             # 空文字列のタイトル
             pytest.param(
-                {"title": "", "description": "test description", "completed": False},
+                {
+                    "title": "",
+                    "description": "test description",
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "title is required",
                 id="empty_string_title",
             ),
             # スペースのみのタイトル
             pytest.param(
-                {"title": "   ", "description": "test description", "completed": False},
+                {
+                    "title": "   ",
+                    "description": "test description",
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "title is required",
                 id="whitespace_only_title",
             ),
             # 型エラーメッセージを期待（タイトル）
             pytest.param(
-                {"title": None, "description": "test description", "completed": False},
+                {
+                    "title": None,
+                    "description": "test description",
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "Input should be a valid string",
                 id="none_title",
             ),
             # 空文字列の説明
             pytest.param(
-                {"title": "test title", "description": "", "completed": False},
+                {
+                    "title": "test title",
+                    "description": "",
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "description is required",
                 id="empty_description",
             ),
             # スペースのみの説明
             pytest.param(
-                {"title": "test title", "description": "   ", "completed": False},
+                {
+                    "title": "test title",
+                    "description": "   ",
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "description is required",
                 id="whitespace_only_description",
             ),
             # 型エラーメッセージを期待（説明）
             pytest.param(
-                {"title": "test title", "description": None, "completed": False},
+                {
+                    "title": "test title",
+                    "description": None,
+                    "completed": False,
+                    "user_id": 1,
+                },
                 "Input should be a valid string",
                 id="none_description",
             ),
@@ -239,12 +302,14 @@ class TestTodoReadSuccessCases:
                     "title": "test title",
                     "description": "test description",
                     "completed": False,
+                    "user_id": 1,
                 },
                 TodoRead(
                     id=1,
                     title="test title",
                     description="test description",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_read_no_completed",
             ),
@@ -255,12 +320,14 @@ class TestTodoReadSuccessCases:
                     "title": "test title",
                     "description": "test description",
                     "completed": True,
+                    "user_id": 1,
                 },
                 TodoRead(
                     id=1,
                     title="test title",
                     description="test description",
                     completed=True,
+                    user_id=1,
                 ),
                 id="valid_todo_read_completed",
             ),
@@ -270,12 +337,14 @@ class TestTodoReadSuccessCases:
                     "id": 1,
                     "title": "test title",
                     "description": "test description",
+                    "user_id": 1,
                 },
                 TodoRead(
                     id=1,
                     title="test title",
                     description="test description",
                     completed=False,
+                    user_id=1,
                 ),
                 id="valid_todo_read_default_completed",
             ),
@@ -299,24 +368,27 @@ class TestTodoUpdateSuccessCases:
             pytest.param(
                 {
                     "title": "updated title",
+                    "user_id": 1,
                 },
-                TodoUpdate(title="updated title"),
+                TodoUpdate(title="updated title", user_id=1),
                 id="valid_todo_update_title_only",
             ),
             # 説明のみの更新
             pytest.param(
                 {
                     "description": "updated description",
+                    "user_id": 1,
                 },
-                TodoUpdate(description="updated description"),
+                TodoUpdate(description="updated description", user_id=1),
                 id="valid_todo_update_description_only",
             ),
             # 完了状態のみの更新
             pytest.param(
                 {
                     "completed": True,
+                    "user_id": 1,
                 },
-                TodoUpdate(completed=True),
+                TodoUpdate(completed=True, user_id=1),
                 id="valid_todo_update_completed",
             ),
             # 全フィールドの更新
@@ -325,16 +397,22 @@ class TestTodoUpdateSuccessCases:
                     "title": "updated title",
                     "description": "updated description",
                     "completed": True,
+                    "user_id": 1,
                 },
                 TodoUpdate(
-                    title="updated title", description="updated description", completed=True
+                    title="updated title",
+                    description="updated description",
+                    completed=True,
+                    user_id=1,
                 ),
                 id="valid_todo_update_all_fields",
             ),
             # 更新対象なし
             pytest.param(
-                {},
-                TodoUpdate(),
+                {
+                    "user_id": 1,
+                },
+                TodoUpdate(user_id=1),
                 id="valid_todo_update_no_fields",
             ),
         ],
