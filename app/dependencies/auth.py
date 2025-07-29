@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 # ruff: noqa: RUF029
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
-    auth_usecase: AuthUsecase = Depends(),
+    auth_usecase: Annotated[AuthUsecase, Depends()],
 ) -> UserReadWithPassword:
     """現在のユーザーを取得する。
 
@@ -42,7 +42,7 @@ async def get_current_user(
 
 async def get_current_active_user(
     current_user: Annotated[UserReadWithPassword, Depends(get_current_user)],
-    auth_usecase: AuthUsecase = Depends(),
+    auth_usecase: Annotated[AuthUsecase, Depends()],
 ) -> UserReadWithPassword:
     """現在のアクティブユーザーを取得する。
 
