@@ -620,7 +620,7 @@ class TestTodoRepositoryErrorCases:
         error_message: str,
     ) -> None:
         """update_todo()の異常ケースのテスト"""
-        todo_update = TodoUpdate(title="updated")
+        todo_update = TodoUpdate(title="updated", user_id=user_id)
         repository = TodoRepository(get_test_session)
 
         with pytest.raises(ValueError, match=error_message):
@@ -734,7 +734,7 @@ class TestTodoRepositoryErrorCases:
         """get_todo_by_idで違うユーザーのTodoを取得しようとした場合の異常ケースのテスト"""
         repository = TodoRepository(get_test_session)
         with pytest.raises(ValueError, match=expected_error_message):
-            repository.get_todo_by_id(todo_id, user_id)
+            repository._get_todo_by_id(todo_id, user_id)
 
     # =============================================================================
     # update_todoで違うユーザーのTodoを更新しようとした場合の異常ケースのテスト
