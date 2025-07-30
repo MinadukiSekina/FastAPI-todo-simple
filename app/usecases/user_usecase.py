@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.infrastructure.auth import get_password_hash
-from app.models.user import UserBase, UserCreate, UserRead
+from app.models.user import UserCreate, UserRead
 from app.repositories.user_repository import UserRepository
 
 
@@ -41,8 +41,9 @@ class UserUsecase:
         """
         self.user_repository = user_repository
 
+    """ 一時的にコメントアウト
     def get_users(self) -> list[UserRead]:
-        """全てのUserを取得する。
+        \"""全てのUserを取得する。
 
         データベースから全てのUserを取得し、
         表示用のモデルとして返します。
@@ -52,12 +53,12 @@ class UserUsecase:
 
         Raises:
             データベースアクセスエラーなどの例外が発生する可能性があります。
-        """
+        \"""
         users = self.user_repository.get_users()
         return [UserRead.model_validate(user) for user in users]
 
     def get_user(self, user_id: int) -> UserRead:
-        """指定されたIDのUserを取得する。
+        \"""指定されたIDのUserを取得する。
 
         データベースから指定されたIDのUserを取得し、
         表示用のモデルとして返します。
@@ -71,9 +72,10 @@ class UserUsecase:
         Raises:
             ValueError: 指定されたIDのUserが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
-        """
+        \"""
         user = self.user_repository.get_user(user_id)
         return UserRead.model_validate(user)
+    """
 
     def create_user(self, user_create: UserCreate) -> UserRead:
         """新しいUserを作成する。
@@ -100,8 +102,9 @@ class UserUsecase:
         user = self.user_repository.create_user(user_data)
         return UserRead.model_validate(user)
 
+    """ 一時的にコメントアウト
     def update_user(self, user_id: int, user_update: UserBase) -> UserRead:
-        """指定されたIDのUserを更新する。
+        \"""指定されたIDのUserを更新する。
 
         指定されたIDのUserを更新し、
         データベースに変更を保存します。
@@ -116,13 +119,13 @@ class UserUsecase:
         Raises:
             ValueError: 指定されたIDのUserが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
-        """
+        \"""
         user_data = user_update.model_dump()
         user = self.user_repository.update_user(user_id, user_data)
         return UserRead.model_validate(user)
 
     def delete_user(self, user_id: int) -> bool:
-        """指定されたIDのUserを削除する。
+        \"""指定されたIDのUserを削除する。
 
         指定されたIDのTodoアイテムをデータベースから削除します。
 
@@ -135,5 +138,6 @@ class UserUsecase:
         Raises:
             ValueError: 指定されたIDのUserが見つからない場合
             データベースアクセスエラーなどの例外が発生する可能性があります。
-        """
+        \"""
         return self.user_repository.delete_user(user_id)
+    """
