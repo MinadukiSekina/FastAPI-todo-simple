@@ -14,7 +14,7 @@ from app.infrastructure.auth import (
     verify_password,
 )
 from app.models.token import Token
-from app.models.user import UserReadWithPassword
+from app.models.user import UserRead
 from app.repositories.user_repository import UserRepository
 
 
@@ -49,7 +49,7 @@ class AuthUsecase:
         """
         self.user_repository = user_repository
 
-    def authenticate_user(self, username: str, password: str) -> UserReadWithPassword | None:
+    def authenticate_user(self, username: str, password: str) -> UserRead | None:
         """ユーザーを認証する。
 
         指定されたユーザー名とパスワードでユーザーを認証します。
@@ -59,23 +59,23 @@ class AuthUsecase:
             password (str): パスワード
 
         Returns:
-            User | None: 認証が成功した場合Userオブジェクト、失敗した場合None
+            UserRead | None: 認証が成功した場合UserReadオブジェクト、失敗した場合None
         """
         try:
-            user = self.user_repository.get_user_by_username_with_password(username)
-            if not user:
+            user_with_password = self.user_repository.get_user_by_username_with_password(username)
+            if not user_with_password:
                 return None
-            if not verify_password(password, user.hashed_password):
+            if not verify_password(password, user_with_password.hashed_password):
                 return None
-            return user
+            return UserRead.model_validate(user_with_password)
         except Exception:
             return None
 
-    def create_access_token_for_user(self, user: UserReadWithPassword) -> Token:
+    def create_access_token_for_user(self, user: UserRead) -> Token:
         """ユーザーのアクセストークンを作成する。
 
         Args:
-            user (User): トークンを作成するユーザー
+            user (UserRead): トークンを作成するユーザー
 
         Returns:
             Token: 作成されたアクセストークン
@@ -86,14 +86,14 @@ class AuthUsecase:
         )
         return Token(access_token=access_token, token_type="bearer")
 
-    def get_current_user_from_token(self, token: str) -> UserReadWithPassword:
+    def get_current_user_from_token(self, token: str) -> UserRead:
         """トークンから現在のユーザーを取得する。
 
         Args:
             token (str): JWTトークン
 
         Returns:
-            User: 現在のユーザー
+            UserRead: 現在のユーザー
 
         Raises:
             HTTPException: トークンが無効な場合
@@ -108,19 +108,19 @@ class AuthUsecase:
         if username is None:
             raise credentials_exception
 
-        user = self.user_repository.get_user_by_username_with_password(username)
+        user = self.user_repository.get_user_by_username(username)
         if user is None:
             raise credentials_exception
-        return user
+        return UserRead.model_validate(user)
 
-    def get_current_active_user(self, user: UserReadWithPassword) -> UserReadWithPassword:
+    def get_current_active_user(self, user: UserRead) -> UserRead:
         """現在のアクティブユーザーを取得する。
 
         Args:
-            user (User): 検証するユーザー
+            user (UserRead): 検証するユーザー
 
         Returns:
-            User: アクティブなユーザー
+            UserRead: アクティブなユーザー
 
         Raises:
             HTTPException: ユーザーが無効な場合

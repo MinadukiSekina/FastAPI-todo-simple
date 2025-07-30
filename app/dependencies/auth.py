@@ -10,7 +10,7 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
-from app.models.user import UserRead, UserReadWithPassword
+from app.models.user import UserRead
 from app.usecases.auth_usecase import AuthUsecase
 
 # OAuth2スキームの設定
@@ -21,7 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     auth_usecase: Annotated[AuthUsecase, Depends()],
-) -> UserReadWithPassword:
+) -> UserRead:
     """現在のユーザーを取得する。
 
     JWTトークンから現在のユーザーを取得します。
@@ -32,7 +32,7 @@ async def get_current_user(
         auth_usecase (AuthUsecase): 認証ユースケース
 
     Returns:
-        User: 現在のユーザー
+        UserRead: 現在のユーザー
 
     Raises:
         HTTPException: トークンが無効な場合
@@ -41,20 +41,17 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: Annotated[UserReadWithPassword, Depends(get_current_user)],
+    current_user: Annotated[UserRead, Depends(get_current_user)],
     auth_usecase: Annotated[AuthUsecase, Depends()],
-) -> UserReadWithPassword:
+) -> UserRead:
     """現在のアクティブユーザーを取得する。
 
-    現在のユーザーがアクティブかどうかを確認します。
-    FastAPIの依存性注入システムで使用されます。
-
     Args:
-        current_user (User): 現在のユーザー
+        current_user (UserRead): 現在のユーザー
         auth_usecase (AuthUsecase): 認証ユースケース
 
     Returns:
-        User: アクティブなユーザー
+        UserRead: 現在のアクティブユーザー
 
     Raises:
         HTTPException: ユーザーが無効な場合
@@ -63,14 +60,14 @@ async def get_current_active_user(
 
 
 async def get_current_active_user_read(
-    current_user: Annotated[UserReadWithPassword, Depends(get_current_active_user)],
+    current_user: Annotated[UserRead, Depends(get_current_active_user)],
 ) -> UserRead:
     """現在のアクティブユーザーを読み取り用モデルで取得する。
 
     Args:
-        current_user (User): 現在のアクティブユーザー
+        current_user (UserRead): 現在のアクティブユーザー
 
     Returns:
         UserRead: 読み取り用のユーザーモデル
     """
-    return UserRead.model_validate(current_user)
+    return current_user

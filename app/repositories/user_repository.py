@@ -67,22 +67,22 @@ class UserRepository:
         if user is None:
             raise ValueError(f"User with id {user_id} not found")
         return UserRead.model_validate(user)
+    """
 
-    def get_user_by_username(self, username: str) -> UserRead | None:
-        \"""指定されたユーザー名のユーザーを取得する。
+    def get_user_by_username(self, username: str) -> UserRead:
+        """指定されたユーザー名のユーザーを取得する。
 
         Args:
             username (str): 取得するユーザーのユーザー名
 
         Returns:
             UserRead: 指定されたユーザー、見つからない場合はエラーを返す
-        \"""
+        """
         statement = select(User).where(User.username == username)
         user = self.session.exec(statement).first()
         if user is None:
             raise ValueError(f"User with username {username} not found")
         return UserRead.model_validate(user)
-    """
 
     def get_user_by_username_with_password(self, username: str) -> UserReadWithPassword:
         """指定されたユーザー名のユーザーを取得する。（パスワードを含む）
