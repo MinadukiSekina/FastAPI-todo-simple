@@ -103,15 +103,18 @@ class AuthUsecase:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        payload = decode_access_token(token)
-        username = payload.get("sub")
-        if username is None:
-            raise credentials_exception
+        try:
+            payload = decode_access_token(token)
+            username = payload.get("sub")
+            if username is None:
+                raise credentials_exception
 
-        user = self.user_repository.get_user_by_username(username)
-        if user is None:
-            raise credentials_exception
-        return UserRead.model_validate(user)
+            user = self.user_repository.get_user_by_username(username)
+            if user is None:
+                raise credentials_exception
+            return UserRead.model_validate(user)
+        except Exception:
+            raise credentials_exception from None
 
     def get_current_active_user(self, user: UserRead) -> UserRead:
         """現在のアクティブユーザーを取得する。
